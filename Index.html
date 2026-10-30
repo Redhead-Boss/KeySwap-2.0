@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Переключатель раскладки — EN ⇄ RU</title>
+<style>
+  :root {
+    --bg: #f2f4f9;
+    --card: #ffffff;
+    --text: #1c2333;
+    --muted: #6b7280;
+    --accent: #3b57e3;
+    --accent-hover: #2c43c7;
+    --accent-soft: #e8ecfd;
+    --border: #e3e7f1;
+    --radius: 16px;
+    --shadow: 0 12px 32px rgba(28, 35, 51, 0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 70% -10%, #e2e7fb 0%, var(--bg) 55%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 720px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px 36px 32px;
+  }
+
+  header { margin-bottom: 28px; }
+
+  h1 {
+    font-size: clamp(1.45rem, 3.2vw, 2rem);
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.98rem;
+    max-width: 60ch;
+  }
+
+  /* Поле направления */
+  .direction {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent-soft);
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 18px;
+  }
+
+  .direction button {
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+    font-family: inherit;
+  }
+
+  .direction button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59, 87, 227, 0.35);
+  }
+
+  .direction button:hover:not([aria-pressed="true"]) { background: rgba(59,87,227,.10); }
+  .direction button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .swap {
+    border: none;
+    background: #fff;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 16px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 6px rgba(28,35,51,.12);
+    transition: transform .25s ease, background .18s ease;
+  }
+  .swap:hover { background: var(--accent-soft); transform: rotate(180deg); }
+  .swap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Поля */
+  .field { margin-bottom: 22px; }
+
+  .field-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  label { font-weight: 600; font-size: 0.95rem; }
+
+  .hint {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    resize: vertical;
+    padding: 16px 18px;
+    font-size: 1.06rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fafbfe;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    line-height: 1.6;
+  }
+
+  textarea::placeholder { color: #a4adc2; }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(59, 87, 227, 0.13);
+  }
+
+  /* Кнопки действий */
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .btn {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 13px 22px;
+    border-radius: 11px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: transform .12s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(59, 87, 227, 0.28);
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: #fff;
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .btn-ghost:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .btn-quiet {
+    background: transparent;
+    color: var(--muted);
+    padding: 13px 14px;
+  }
+  .btn-quiet:hover { color: var(--text); background: var(--accent-soft); }
+
+  /* Примеры */
+  .examples {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  .examples h2 {
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .chip {
+    font-size: 0.87rem;
+    padding: 8px 13px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all .18s ease;
+    font-family: inherit;
+  }
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateY(-1px);
+  }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .tip {
+    margin-top: 18px;
+    font-size: 0.84rem;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  kbd {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Тост */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translate(-50%, 24px);
+    background: var(--text);
+    color: #fff;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  footer {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 560px) {
+    .app { padding: 26px 20px 24px; }
+    .actions .btn { flex: 1 1 100%; justify-content: center; }
+    .direction { width: 100%; justify-content: space-between; }
+    .direction button { flex: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    .swap:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="app">
+  <header>
+    <h1>Переключатель раскладки <span class="badge">EN ⇄ RU</span></h1>
+    <p class="subtitle">
+      Забыли переключить язык ввода? Вставьте текст, набранный «не той» раскладкой, — и получите правильный вариант.
+    </p>
+  </header>
+
+  <div class="direction" role="group" aria-label="Направление конвертации">
+    <button type="button" id="dirEnRu" aria-pressed="true">EN → RU</button>
+    <button type="button" id="dirRuEn" aria-pressed="false">RU → EN</button>
+    <button type="button" class="swap" id="swapBtn" title="Поменять направление" aria-label="Поменять направление конвертации">⇄</button>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <label for="input" id="inputLabel">Ввод (набрано не той раскладкой)</label>
+      <span class="hint"><span id="inputCount">0</span> символов</span>
+    </div>
+    <textarea id="input" placeholder="Например: Cblbn pf htitnrjq d ntvybwt cshjq" spellcheck="false" autocomplete="off"></textarea>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <label for="output" id="outputLabel">Результат</label>
+      <span class="hint" id="outputStatus" aria-live="polite">—</span>
+    </div>
+    <textarea id="output" placeholder="Здесь появится перевод" readonly spellcheck="false"></textarea>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn btn-primary" id="convertBtn">
+      <span>Конвертировать</span>
+      <span>↵</span>
+    </button>
+    <button type="button" class="btn btn-ghost" id="copyBtn">Скопировать</button>
+    <button type="button" class="btn btn-ghost" id="backBtn" title="Вернуть исходный текст">↺ Обратно</button>
+    <button type="button" class="btn btn-quiet" id="clearBtn">Очистить</button>
+  </div>
+
+  <section class="examples">
+    <h2>Попробовать примеры</h2>
+    <div class="chips">
+      <button class="chip" type="button" data-example="Cblbn pf htitnrjq d ntvybwt cshjq">Cblbn pf htitnrjq…</button>
+      <button class="chip" type="button" data-example="rjvgm.nthm yt jnrk.xty">rjvgm.nthm yt jnrk.xty</button>
+      <button class="chip" type="button" data-example="Ghbdtn vbh">Ghbdtn vbh</button>
+      <button class="chip" type="button" data-example="Yfcnjq rfhtym">Yfcnjq rfhtym</button>
+      <button class="chip" type="button" data-example="Cjj,otybt">Cjj,otybt</button>
+    </div>
+
+    <p class="tip">
+      <span>💡</span>
+      <span>
+        Горячие клавиши: <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Enter</kbd> — конвертировать,
+        <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> — копировать,
+        <kbd>Esc</kbd> — очистить. Конвертация также выполняется автоматически при наборе.
+      </span>
+    </p>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<footer>Работает локально, без отправки данных на сервер.</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ===== Маппинг раскладок =====
+  // RU -> EN (для кнопки "Обратно" и режима RU → EN)
+  const RU_TO_EN = {
+    'й':'q','ц':'w','у':'e','к':'r','е':'t','н':'y','г':'u','ш':'i','щ':'o','з':'p',
+    'х':'[','ъ':']','ф':'a','ы':'s','в':'d','а':'f','п':'g','р':'h','о':'j','л':'k',
+    'д':'l','ж':';','э':"'",'я':'z','ч':'x','с':'c','м':'v','и':'b','т':'n','ь':'m',
+    'б':',','.':'.','ё':'`',
+    'Й':'Q','Ц':'W','У':'E','К':'R','Е':'T','Н':'Y','Г':'U','Ш':'I','Щ':'O','З':'P',
+    'Х':'{','Ъ':'}','Ф':'A','Ы':'S','В':'D','А':'F','П':'G','Р':'H','О':'J','Л':'K',
+    'Д':'L','Ж':':','Э':'"','Я':'Z','Ч':'X','С':'C','М':'V','И':'B','Т':'N','Ь':'M',
+    'Б':'<','Ю':'>','Ё':'~'
+  };
+
+  // EN -> RU (основной сценарий: забыли переключить язык)
+  const EN_TO_RU = {
+    'q':'й','w':'ц','e':'у','r':'к','t':'е','y':'н','u':'г','i':'ш','o':'щ','p':'з',
+    '[':'х',']':'ъ','a':'ф','s':'ы','d':'в','f':'а','g':'п','h':'р','j':'о','k':'л',
+    'l':'д',';':'ж',"'":'э','z':'я','x':'ч','c':'с','v':'м','b':'и','n':'т','m':'ь',
+    ',':'б','.':'ю','`':'ё',
+    'Q':'Й','W':'Ц','E':'У','R':'К','T':'Е','Y':'Н','U':'Г','I':'Ш','O':'Щ','P':'З',
+    '{':'Х','}':'Ъ','A':'Ф','S':'Ы','D':'В','F':'А','G':'П','H':'Р','J':'О','K':'Л',
+    'L':'Д',':':'Ж','"':'Э','Z':'Я','X':'Ч','C':'С','V':'М','B':'И','N':'Т','M':'Ь',
+    '<':'Б','>':'Ю','~':'Ё'
+  };
+
+  // Дополнительно: цифры и Shift-символы (зависят от раскладки)
+  // В русской раскладке цифры + Shift дают другие знаки, чем в английской.
+  const EN_SHIFT_TO_RU = {
+    '!':'!', '@':'"', '#':'№', '$':';', '%':'%', '^':':', '&':'?', '*':'*',
+    '(':'(', ')':')', '_':'_', '+':'+', '-':'-', '=':'=', '/':',', '\\':'\\',
+    '|':'/', '<':'<', '>':'>', '?':'.', ':':';', '"':'\''
+  };
+
+  const RU_SHIFT_TO_EN = {
+    '!':'!', '"':'@', '№':'#', ';':'$', '%':'%', ':':'^', '?':'&', '*':'*',
+    '(':'(', ')':')', '_':'_', '+':'+', '-':'-', '=':'=', ',':'/', '\\':'\\',
+    '/':'|', '<':'<', '>':'>', '.':'?', ';':':', "'":'"'
+  };
+
+  function convertText(text, map) {
+    let out = '';
+    for (const ch of text) out += (map[ch] !== undefined ? map[ch] : ch);
+    return out;
+  }
+
+  // Автоопределение: какой вариант «похож» на осмысленный
+  function autoConvert(text) {
+    const toRu = convertText(text, EN_TO_RU);
+    const toEn = convertText(text, RU_TO_EN);
+
+    const ruScore = score(toRu);
+    const enScore = score(toEn);
+    return ruScore >= enScore ? toRu : toEn;
+  }
+
+  // Простейшая эвристика «осмысленности»: количество словарных стоп-слов и гласных.
+  const RU_STOP = new Set(['и','в','на','за','с','для','по','не','что','это','как','но','а','о','к','у','от','до','из','мы','вы','он','она','их','её','его','бы','ли','же','был','быть']);
+  const EN_STOP = new Set(['a','an','the','is','are','was','be','to','of','in','on','and','or','for','it','that','this','with','as','at','by','from','not','but']);
+
+  const RU_VOWELS = new Set('аеёиоуыэюя');
+  const EN_VOWELS = new Set('aeiouy');
+
+  function score(t) {
+    const lower = t.toLowerCase();
+    const words = lower.split(/[^a-zа-яё]+/i).filter(Boolean);
+    if (words.length === 0) return 0;
+
+    let s = 0;
+    for (const w of words) {
+      if (RU_STOP.has(w)) s += 2;
+      if (EN_STOP.has(w)) s -= 2;
+    }
+    // доля гласных (для русского ~ 37-40%, для английского ~ 38%, поэтому слабый вес)
+    for (const ch of lower) {
+      if (RU_VOWELS.has(ch)) s += 0.4;
+      if (EN_VOWELS.has(ch)) s -= 0.1;
+    }
+    // штраф за «странные» сочетания букв
+    if (/[а-яё]{0}ь[бвгджзклмнпрстфхцчшщ]/i.test(t)) s -= 3; // ь в начале слова-признак «мусора»
+    if (/ы[аеёиоуыэюя]/i.test(t)) s -= 1;
+    return s;
+  }
+
+  // ===== DOM =====
+  const input = document.getElementById('input');
+  const output = document.getElementById('output');
+  const convertBtn = document.getElementById('convertBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const backBtn = document.getElementById('backBtn');
+  const swapBtn = document.getElementById('swapBtn');
+  const dirEnRu = document.getElementById('dirEnRu');
+  const dirRuEn = document.getElementById('dirRuEn');
+  const inputLabel = document.getElementById('inputLabel');
+  const outputLabel = document.getElementById('outputLabel');
+  const outputStatus = document.getElementById('outputStatus');
+  const inputCount = document.getElementById('inputCount');
+  const toast = document.getElementById('toast');
+
+  let mode = 'en-ru'; // 'en-ru' | 'ru-en' | 'auto'
+  let lastResult = '';
+
+  // ===== Логика =====
+  function doConvert() {
+    const text = input.value;
+    if (!text.trim()) {
+      output.value = '';
+      outputStatus.textContent = '—';
+      lastResult = '';
+      return;
+    }
+
+    let result;
+    if (mode === 'en-ru') result = convertText(text, EN_TO_RU);
+    else if (mode === 'ru-en') result = convertText(text, RU_TO_EN);
+    else result = autoConvert(text);
+
+    output.value = result;
+    lastResult = result;
+    outputStatus.textContent = 'Готово ✓';
+    setTimeout(() => { outputStatus.textContent = result.length + ' символов'; }, 1200);
+  }
+
+  function updateLabels() {
+    if (mode === 'en-ru') {
+      inputLabel.textContent = 'Ввод (набрано английской раскладкой)';
+      outputLabel.textContent = 'Результат (русский)';
+      input.placeholder = 'Например: Cblbn pf htitnrjq d ntvybwt cshjq';
+    } else if (mode === 'ru-en') {
+      inputLabel.textContent = 'Ввод (набрано русской раскладкой)';
+      outputLabel.textContent = 'Результат (английский)';
+      input.placeholder = 'Например: Сидит за решеткой в темнице сырой';
+    } else {
+      inputLabel.textContent = 'Ввод (раскладка неизвестна)';
+      outputLabel.textContent = 'Результат (автоопределение)';
+      input.placeholder = 'Вставьте текст — определю раскладку автоматически';
+    }
+  }
+
+  function setMode(next) {
+    mode = next;
+    dirEnRu.setAttribute('aria-pressed', String(next === 'en-ru'));
+    dirRuEn.setAttribute('aria-pressed', String(next === 'ru-en'));
+    updateLabels();
+    doConvert();
+    saveState();
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  async function copyResult() {
+    const text = output.value;
+    if (!text) { showToast('Нечего копировать'); return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Скопировано ✓');
+    } catch (e) {
+      output.select();
+      document.execCommand('copy');
+      showToast('Скопировано ✓');
+    }
+  }
+
+  function clearAll() {
+    input.value = '';
+    output.value = '';
+    lastResult = '';
+    inputCount.textContent = '0';
+    outputStatus.textContent = '—';
+    input.focus();
+    saveState();
+  }
+
+  function goBack() {
+    if (!output.value) return;
+    // Возвращаем исходный: просто кладём результат обратно в инпут и инвертируем
+    input.value = lastResult ? convertText(output.value, mode === 'ru-en' ? EN_TO_RU : (mode === 'en-ru' ? RU_TO_EN : EN_TO_RU)) : input.value;
+    doConvert();
+    showToast('Вернул исходный текст');
+  }
+
+  function swap() {
+    const t = input.value;
+    input.value = output.value;
+    output.value = t;
+    if (mode === 'en-ru') setMode('ru-en');
+    else if (mode === 'ru-en') setMode('en-ru');
+    else doConvert();
+    showToast('Направление изменено');
+  }
+
+  // ===== Сохранение состояния (localStorage) =====
+  function saveState() {
+    try {
+      localStorage.setItem('layout-swap', JSON.stringify({ mode, text: input.value }));
+    } catch (e) {}
+  }
+
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem('layout-swap') || '{}');
+      if (s.mode) mode = s.mode;
+      if (s.text) input.value = s.text;
+    } catch (e) {}
+  }
+
+  // ===== События =====
+  input.addEventListener('input', () => {
+    inputCount.textContent = String(input.value.length);
+    doConvert();
+    saveState();
+  });
+
+  convertBtn.addEventListener('click', doConvert);
+  copyBtn.addEventListener('click', copyResult);
+  clearBtn.addEventListener('click', clearAll);
+  backBtn.addEventListener('click', goBack);
+  swapBtn.addEventListener('click', swap);
+  dirEnRu.addEventListener('click', () => setMode('en-ru'));
+  dirRuEn.addEventListener('click', () => setMode('ru-en'));
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      input.value = chip.dataset.example;
+      inputCount.textContent = String(input.value.length);
+      setMode('en-ru');
+      doConvert();
+      input.focus();
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    const meta = e.ctrlKey || e.metaKey;
+    if (meta && e.key === 'Enter') { e.preventDefault(); doConvert(); }
+    else if (meta && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); copyResult(); }
+    else if (e.key === 'Escape') { clearAll(); }
+  });
+
+  // ===== Init =====
+  loadState();
+  updateLabels();
+  dirEnRu.setAttribute('aria-pressed', String(mode === 'en-ru'));
+  dirRuEn.setAttribute('aria-pressed', String(mode === 'ru-en'));
+  inputCount.textContent = String(input.value.length);
+  doConvert();
+  input.focus();
+})();
+</script>
+
+</body>
+</html>
